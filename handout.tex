@@ -1,12 +1,14 @@
 % Based on tufte-handout.tex - DESC
 % Iago Mosqueira - JRC. 2013
 % https://gist.github.com/reinholdsson/7426608/566d8104363cd2fef2d6dd50e90aceab377b4a45
+% Caleb McDaniel
+% https://github.com/wcaleb/pandoc-templates/blob/master/handout.tex
+% Anpassningar till svenska m.m. av Isak Bergdahl
+% https://github.com/krevad/pandoc-templates/blob/bac970f5510776de921c2841f9ed0807071bddc0/handout.tex
 
-% Example input file: https://t.co/Jl73l6p8rA
-% Example output file: https://t.co/udpLlvml8X
+\documentclass[$if(fontsize)$$fontsize$,$endif$$if(lang)$$babel-lang$,$endif$$if(papersize)$$papersize$paper,$endif$$for(classoption)$$classoption$$sep$,$endfor$]{$if(documentclass)$$documentclass$$else$tufte-handout$endif$}
 
-\documentclass{tufte-handout}
- 
+
 \providecommand{\note}{\textsf}
 \renewcommand{\large}{\normalsize}
 \renewcommand{\huge}{\normalsize}
@@ -30,8 +32,11 @@ $endif$
 \ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
+$if(euro)$
+  \usepackage{eurosym}
+$endif$
 \fi
- 
+
 % add line numbers (Caleb McDaniel)
 $if(linenos)$
 \usepackage[modulo]{lineno}
@@ -48,51 +53,113 @@ $if(symbol)$
 \renewcommand*{\thefootnote}{\fnsymbol{footnote}}
 $endif$
 
+\hypersetup{
+$if(title-meta)$
+            pdftitle={$title-meta$},
+$endif$
+$if(author-meta)$
+            pdfauthor={$author-meta$},
+$endif$
+$if(keywords)$
+            pdfkeywords={$for(keywords)$$keywords$$sep$, $endfor$},
+$endif$
+$if(colorlinks)$
+            colorlinks=true,
+            linkcolor=$if(linkcolor)$$linkcolor$$else$Maroon$endif$,
+            citecolor=$if(citecolor)$$citecolor$$else$Blue$endif$,
+            urlcolor=$if(urlcolor)$$urlcolor$$else$Blue$endif$,
+$else$
+            pdfborder={0 0 0},
+$endif$
+            bookmarks=true,
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+
+
+$if(lang)$
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[shorthands=off,$for(babel-otherlangs)$$babel-otherlangs$,$endfor$main=$babel-lang$]{babel}
+$if(babel-newcommands)$
+  $babel-newcommands$
+$endif$
+\else
+  \usepackage{polyglossia}
+  \setmainlanguage[$polyglossia-lang.options$]{$polyglossia-lang.name$}
+$for(polyglossia-otherlangs)$
+  \setotherlanguage[$polyglossia-otherlangs.options$]{$polyglossia-otherlangs.name$}
+$endfor$
+\fi
+$endif$
+
 % Set up the images/graphics package
-\usepackage{graphicx}
+\usepackage{graphicx,grffile}
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
 \setkeys{Gin}{width=\linewidth,totalheight=\textheight,keepaspectratio}
 \graphicspath{{graphics/}}
- 
+
 % \let\Oldincludegraphics\includegraphics
 % \renewcommand{\includegraphics}[1]{\Oldincludegraphics[trim={0 3in 0 0},clip,width=\textwidth]{#1}}
 
-% natbib
+$if(natbib)$
 \usepackage{natbib}
-\bibliographystyle{plainnat}
- 
-% biblatex
+\bibliographystyle{$if(biblio-style)$$biblio-style$$else$plainnat$endif$}
+$endif$
 $if(biblatex)$
-\usepackage{biblatex}
-$if(biblio-files)$
-\bibliography{$biblio-files$}
+\usepackage[$if(biblio-style)$style=$biblio-style$,$endif$$for(biblatexoptions)$$biblatexoptions$$sep$,$endfor$]{biblatex}
+$for(bibliography)$
+\addbibresource{$bibliography$}
+$endfor$
 $endif$
+
+$if(listings)$
+\usepackage{listings}
 $endif$
- 
+$if(lhs)$
+\lstnewenvironment{code}{\lstset{language=Haskell,basicstyle=\small\ttfamily}}{}
+$endif$
+$if(highlighting-macros)$
+$highlighting-macros$
+$endif$
+
 % booktabs
 \usepackage{longtable,booktabs}
- 
+% Fix footnotes in tables (requires footnote package)
+\IfFileExists{footnote.sty}{\usepackage{footnote}\makesavenoteenv{long table}}{}
+
+$if(indent)$
+$else$
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+$endif$
+
 % url
 \usepackage{url}
- 
+
 % hyperref
 \usepackage{hyperref}
- 
+
 % units.
 \usepackage{units}
- 
+
 % fancyvrb
 \usepackage{fancyvrb}
 \fvset{fontsize=\normalsize}
 \DefineShortVerb[commandchars=\\\{\}]{\|}
 \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
- 
- 
+
+
 % multiplecol
 \usepackage{multicol}
- 
+
 % lipsum
 \usepackage{lipsum}
- 
+
 % These commands are used to pretty-print LaTeX commands
 \newcommand{\doccmd}[1]{\texttt{\textbackslash#1}}% command name -- adds backslash automatically
 \newcommand{\docopt}[1]{\ensuremath{\langle}\textrm{\textit{#1}}\ensuremath{\rangle}}% optional command argument
@@ -102,7 +169,7 @@ $endif$
 \newcommand{\docpkg}[1]{\texttt{#1}}% package name
 \newcommand{\doccls}[1]{\texttt{#1}}% document class name
 \newcommand{\docclsopt}[1]{\texttt{#1}}% document class option name
- 
+
 % Shaded
 \newenvironment{Shaded}{}{}
 \newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
@@ -125,24 +192,31 @@ $for(header-includes)$
 $header-includes$
 $endfor$
 
+% https://github.com/jgm/pandoc/releases/tag/1.14
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
 $if(title)$
-\title{$title$}
+\title{$title$$if(thanks)$\thanks{$thanks$}$endif$}
+$endif$
+$if(subtitle)$
+\providecommand{\subtitle}[1]{}
+\subtitle{$subtitle$}
 $endif$
 $if(author)$
 \author{$for(author)$$author$$sep$ \and $endfor$}
 $endif$
-$if(date)$
-\date{$date$}
+$if(institute)$
+\providecommand{\institute}[1]{}
+\institute{$for(institute)$$institute$$sep$ \and $endfor$}
 $endif$
- 
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\date{$date$}
 
 \begin{document}
 $if(title)$
 \maketitle
 $endif$
- 
+
 \bigskip
 
 $if(abstract)$
@@ -151,10 +225,14 @@ $abstract$
 \end{abstract}
 $endif$
 
+$for(include-before)$
+$include-before$
+
+$endfor$
 $body$
- 
+
 $if(natbib)$
-$if(biblio-files)$
+$if(bibliography)$
 $if(biblio-title)$
 $if(book-class)$
 \renewcommand\bibname{$biblio-title$}
@@ -162,17 +240,16 @@ $else$
 \renewcommand\refname{$biblio-title$}
 $endif$
 $endif$
-\bibliography{$biblio-files$}
-\bibliographystyle{plainnat}
- 
+\bibliography{$for(bibliography)$$bibliography$$sep$,$endfor$}
+
 $endif$
 $endif$
 $if(biblatex)$
 \printbibliography$if(biblio-title)$[title=$biblio-title$]$endif$
- 
+
 $endif$
 $for(include-after)$
 $include-after$
- 
+
 $endfor$
 \end{document}
