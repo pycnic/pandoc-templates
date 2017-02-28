@@ -6,7 +6,7 @@
 % Anpassningar till svenska m.m. av Isak Bergdahl
 % https://github.com/krevad/pandoc-templates/blob/bac970f5510776de921c2841f9ed0807071bddc0/handout.tex
 
-\documentclass[$if(fontsize)$$fontsize$,$endif$$if(lang)$$babel-lang$,$endif$$if(papersize)$$papersize$paper,$endif$$for(classoption)$$classoption$$sep$,$endfor$]{$if(documentclass)$$documentclass$$else$tufte-handout$endif$}
+\documentclass[$if(fontsize)$$fontsize$,$endif$$if(lang)$$babel-lang$,$endif$$if(papersize)$$papersize$paper,$endif$$for(classoption)$$classoption$$sep$,$endfor$]{tufte-handout}
 
 
 \providecommand{\note}{\textsf}
@@ -137,12 +137,6 @@ $else$
 \setlength{\parskip}{6pt plus 2pt minus 1pt}
 }
 $endif$
-
-% url
-\usepackage{url}
-
-% hyperref
-\usepackage{hyperref}
 
 % units.
 \usepackage{units}
